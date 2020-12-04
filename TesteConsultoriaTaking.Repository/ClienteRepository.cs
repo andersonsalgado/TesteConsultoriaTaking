@@ -36,5 +36,28 @@ namespace TesteConsultoriaTaking.Repository
 
             return null;
         }
+
+        public ClienteModel AtualizarCliente(ClienteModel clienteModel)
+        {
+            try
+            {
+                var retorno = this.atualizar(clienteModel);
+
+                if (retorno)
+                {
+                    return clienteModel;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"ClienteRepository - Ocorreu um erro no metodo AdicionarCliente. Erro: {ExceptionHelper.RecuperarDescricaoErro(ex)}");
+            }
+
+
+
+            return null;
+        }
+
     }
 }

@@ -163,7 +163,13 @@ namespace TesteConsultoriaTaking.Shared
                 {
                     var listaQuery = (List<TEntity>)lista;
                     _context.Set<TEntity>().RemoveRange(listaQuery);
-                    retorno = true;
+
+                    int retornoSave = _context.SaveChanges();
+                    if (retornoSave >= 0)
+                    {
+                        retorno = true;
+                    }
+
                 }
             }
 

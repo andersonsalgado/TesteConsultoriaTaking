@@ -28,5 +28,12 @@ namespace TesteConsultoriaTaking.Models
             this.Idade = idade;
         }
 
+        public ClienteModel(Guid id, string nome, int idade)
+        {
+            this.Id = id;
+            this.Nome = nome;
+            this.Idade = idade;
+        }
+
     }
 }

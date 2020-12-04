@@ -38,6 +38,7 @@ namespace TesteConsultoriaTaking
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
+                
             });
 
             InjecaoDependencia.InjetarRepositorios(services);
