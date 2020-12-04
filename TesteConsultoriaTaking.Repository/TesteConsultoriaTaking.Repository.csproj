@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TesteConsultoriaTaking.Migrations\TesteConsultoriaTaking.Migrations.csproj" />
+    <ProjectReference Include="..\TesteConsultoriaTaking.Models\TesteConsultoriaTaking.Models.csproj" />
+    <ProjectReference Include="..\TesteConsultoriaTaking.Shared\TesteConsultoriaTaking.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
