@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using TesteConsultoriaTaking.Helpers;
 using TesteConsultoriaTaking.Migrations;
+using TesteConsultoriaTaking.Models;
 
 namespace TesteConsultoriaTaking
 {
@@ -31,9 +32,22 @@ namespace TesteConsultoriaTaking
             //services.AddDbContext<DatabaseContext>(options => 
             //    options.UseSqlServer(Configuration.GetConnectionString("TesteConsultoriaTaking")));
 
-            services.AddControllers().AddJsonOptions(jsonOptions => {
+            services.AddDefaultIdentity<ApplicationUser>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6;
+            })
+            .AddEntityFrameworkStores<DatabaseContext>();
+
+            services.AddControllersWithViews().AddJsonOptions(jsonOptions => {
                 jsonOptions.JsonSerializerOptions.IgnoreNullValues = true;
             });
+
+            services.AddRazorPages();
 
             services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -52,13 +66,21 @@ namespace TesteConsultoriaTaking
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllers();
+                endpoints.MapRazorPages();
             });
 
             InjecaoDependencia.InstanciarRepositorios(_services, serviceProvider, Configuration);

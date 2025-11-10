@@ -1,0 +1,247 @@
+@{
+    ViewData["Title"] = "TreinoX";
+}
+
+<section id="home" class="hero-section">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="badge-pill-custom">Transforme seu treino</span>
+                <h1 class="display-4 fw-bold mt-3 text-dark">Treinos inteligentes para resultados reais</h1>
+                <p class="lead mt-4 text-black-50">Potencialize sua performance com programas personalizados, acompanhamento de evolução e uma plataforma moderna pensada para personal trainers e academias.</p>
+                <div class="d-flex flex-wrap gap-3 align-items-center mt-4">
+                    <a href="#pricing" class="btn btn-gradient btn-lg shadow-sm">Conheça nossos planos</a>
+                    <a href="#funcionalidades" class="btn btn-outline-dark btn-lg border-2">Explorar recursos</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=1200&q=80" alt="Atleta realizando treino funcional" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="funcionalidades" class="py-5 py-lg-5">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Funcionalidades avançadas</h2>
+            <div class="section-divider"></div>
+            <p class="lead text-muted">Do cadastro de clientes à prescrição de treinos, tudo o que você precisa para entregar experiências memoráveis.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <i class="bi bi-people-fill fs-1 text-warning mb-3"></i>
+                    <h5 class="fw-bold">Gestão completa de alunos</h5>
+                    <p class="text-muted">Organize perfis, histórico de treinos e indicadores físicos em uma interface moderna e intuitiva.</p>
+                    <a class="stretched-link" href="/clientes"></a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <i class="bi bi-clipboard-check-fill fs-1 text-warning mb-3"></i>
+                    <h5 class="fw-bold">Planilhas dinâmicas</h5>
+                    <p class="text-muted">Monte treinos personalizados com bibliotecas de exercícios ilustrados e acompanhe a evolução em tempo real.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <i class="bi bi-phone-flip fs-1 text-warning mb-3"></i>
+                    <h5 class="fw-bold">Acesso multiplataforma</h5>
+                    <p class="text-muted">Experiência fluida no computador, tablet ou smartphone para treinadores e alunos.</p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <a href="/clientes" class="btn btn-gradient btn-lg px-5"><i class="bi bi-person-plus-fill me-2"></i>Ir para o cadastro de clientes</a>
+            }
+            else
+            {
+                <a href="@Url.Action("Register", "Account")" class="btn btn-gradient btn-lg px-5"><i class="bi bi-person-plus-fill me-2"></i>Crie sua conta gratuita</a>
+            }
+        </div>
+    </div>
+</section>
+
+<section id="pricing" class="py-5 bg-light">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Planos para cada objetivo</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="pricing-card text-center">
+                    <span class="badge badge-pill-custom mb-3">Starter</span>
+                    <h3 class="fw-bold">R$ 59<span class="fs-6">/mês</span></h3>
+                    <p class="text-muted">Ideal para personal trainers independentes.</p>
+                    <ul class="list-unstyled mt-4 text-start">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>Até 30 alunos ativos</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>Biblioteca de exercícios com vídeos</li>
+                        <li><i class="bi bi-check-circle-fill text-warning me-2"></i>Planilhas ilimitadas</li>
+                    </ul>
+                    <a href="@Url.Action("Register", "Account")" class="btn btn-outline-dark mt-4">Começar agora</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="pricing-card text-center border-2 position-relative overflow-hidden">
+                    <span class="badge bg-dark text-warning position-absolute top-0 end-0 m-3">Mais popular</span>
+                    <span class="badge badge-pill-custom mb-3">Performance</span>
+                    <h3 class="fw-bold">R$ 109<span class="fs-6">/mês</span></h3>
+                    <p class="text-muted">Para studios que querem escala com qualidade.</p>
+                    <ul class="list-unstyled mt-4 text-start">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>Até 120 alunos ativos</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>Relatórios avançados e dashboards</li>
+                        <li><i class="bi bi-check-circle-fill text-warning me-2"></i>Área do aluno com app progressivo</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-gradient mt-4">Falar com um consultor</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="pricing-card text-center">
+                    <span class="badge badge-pill-custom mb-3">Enterprise</span>
+                    <h3 class="fw-bold">Sob medida</h3>
+                    <p class="text-muted">Para redes de academias com necessidades exclusivas.</p>
+                    <ul class="list-unstyled mt-4 text-start">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>Integração com sistemas internos</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>Suporte dedicado 24/7</li>
+                        <li><i class="bi bi-check-circle-fill text-warning me-2"></i>Treinamentos personalizados</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-outline-dark mt-4">Solicitar proposta</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="testimonials" class="py-5">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Relatos de quem já treina com a gente</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="testimonial-card h-100">
+                    <i class="bi bi-quote"></i>
+                    <p class="mt-3">“Com o TreinoX consegui acompanhar os resultados da minha equipe de cross training em tempo real. Os alunos adoram a interface e eu ganho tempo para planejar as aulas.”</p>
+                    <div class="d-flex align-items-center mt-4">
+                        <img class="rounded-circle me-3" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80" alt="Foto de um aluno satisfeito" width="56" height="56" />
+                        <div>
+                            <h6 class="mb-0 fw-bold">Mariana Castro</h6>
+                            <small>Head Coach - Studio Flow</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card h-100">
+                    <i class="bi bi-quote"></i>
+                    <p class="mt-3">“A personalização dos treinos e a comunicação com os alunos ficou muito mais simples. Hoje consigo vender planos premium porque entrego uma experiência diferenciada.”</p>
+                    <div class="d-flex align-items-center mt-4">
+                        <img class="rounded-circle me-3" src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=120&q=80" alt="Foto de cliente" width="56" height="56" />
+                        <div>
+                            <h6 class="mb-0 fw-bold">Diego Fernandes</h6>
+                            <small>Personal Trainer</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card h-100">
+                    <i class="bi bi-quote"></i>
+                    <p class="mt-3">“Integramos todas as unidades da rede e passamos a ter indicadores claros de evolução. O suporte e o onboarding foram impecáveis.”</p>
+                    <div class="d-flex align-items-center mt-4">
+                        <img class="rounded-circle me-3" src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=120&q=80" alt="Foto de cliente" width="56" height="56" />
+                        <div>
+                            <h6 class="mb-0 fw-bold">Carlos Moraes</h6>
+                            <small>Diretor - Rede PowerFit</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="faq" class="py-5 bg-light">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Perguntas frequentes</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="faq-item h-100">
+                    <h5 class="fw-bold">Como funciona a prescrição de treinos?</h5>
+                    <p class="text-muted mb-0">Você monta as séries arrastando exercícios para a agenda do aluno, define repetições e cargas e pode anexar vídeos demonstrativos. O aluno recebe as notificações automaticamente.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="faq-item h-100">
+                    <h5 class="fw-bold">Posso personalizar a identidade visual?</h5>
+                    <p class="text-muted mb-0">Sim! Adicione logo, cores e imagens próprias para reforçar sua marca em cada contato com o aluno.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="faq-item h-100">
+                    <h5 class="fw-bold">O sistema é seguro?</h5>
+                    <p class="text-muted mb-0">Utilizamos autenticação com o Identity Framework e armazenamos os dados em infraestrutura com criptografia e backups automáticos.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="faq-item h-100">
+                    <h5 class="fw-bold">Existe período de teste?</h5>
+                    <p class="text-muted mb-0">Você pode testar todas as funcionalidades gratuitamente por 14 dias e migrar para um plano pago quando estiver pronto.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="contact" class="py-5">
+    <div class="container py-4">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6">
+                <div class="contact-card">
+                    <h3 class="fw-bold mb-4">Fale com nossos especialistas</h3>
+                    <form class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nome</label>
+                            <input type="text" class="form-control" placeholder="Como podemos te chamar?" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">E-mail</label>
+                            <input type="email" class="form-control" placeholder="nome@empresa.com" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Objetivo</label>
+                            <select class="form-select">
+                                <option>Quero digitalizar minha academia</option>
+                                <option>Sou personal trainer</option>
+                                <option>Preciso integrar com outros sistemas</option>
+                                <option>Quero conhecer os planos corporativos</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Mensagem</label>
+                            <textarea class="form-control" rows="4" placeholder="Compartilhe seus desafios"></textarea>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-gradient px-4">Enviar mensagem</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-img-wrapper">
+                    <img src="https://images.unsplash.com/photo-1517832207067-4db24a2ae47c?auto=format&fit=crop&w=1200&q=80" alt="Equipe em treino funcional" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
