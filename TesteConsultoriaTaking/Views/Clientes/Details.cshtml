@@ -1,0 +1,89 @@
+@{
+    ViewData["Title"] = "Detalhes do Cliente";
+    var clienteId = ViewData["ClienteId"]?.ToString();
+}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8">
+                <div class="card-blur p-4">
+                    <span class="badge badge-custom text-uppercase mb-2">Detalhes</span>
+                    <h2 class="section-title fs-2 mb-0">Ficha do aluno</h2>
+                    <p class="text-secondary mb-0">Visualize rapidamente as informações principais antes de atualizar ou criar um novo plano de treino.</p>
+                </div>
+            </div>
+        </div>
+        <div id="mensagemErro" class="alert alert-warning d-none"></div>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="feature-card" id="cardDetalhes" style="display:none;">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="feature-icon"><i class="bi bi-person-fill"></i></div>
+                        <div>
+                            <h3 class="mb-0" id="detalheNome"></h3>
+                            <span class="text-secondary" id="detalheIdade"></span>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <a class="btn btn-outline-warning btn-icon" href="/clientes/editar/@clienteId">
+                            <i class="bi bi-pencil-square"></i>
+                            Editar
+                        </a>
+                        <a class="btn btn-outline-danger btn-icon" href="/clientes/remover/@clienteId">
+                            <i class="bi bi-trash-fill"></i>
+                            Remover
+                        </a>
+                        <a class="btn btn-gradient btn-icon ms-auto" href="/clientes">
+                            <i class="bi bi-arrow-left"></i>
+                            Voltar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script>
+        const clienteId = '@clienteId';
+        const mensagemErro = document.querySelector('#mensagemErro');
+        const cardDetalhes = document.querySelector('#cardDetalhes');
+        const detalheNome = document.querySelector('#detalheNome');
+        const detalheIdade = document.querySelector('#detalheIdade');
+
+        function exibirErro(erros) {
+            const lista = Array.isArray(erros) ? erros : [erros];
+            mensagemErro.innerHTML = lista.map(e => `<div>${e}</div>`).join('');
+            mensagemErro.classList.remove('d-none');
+            cardDetalhes.style.display = 'none';
+        }
+
+        async function carregarCliente() {
+            try {
+                const resposta = await fetch(`/api/cliente/buscarcliente/${clienteId}`);
+                if (resposta.status === 401) {
+                    const retorno = encodeURIComponent(window.location.pathname + window.location.search);
+                    window.location.href = `/Account/Login?returnUrl=${retorno}`;
+                    return;
+                }
+                if (!resposta.ok) {
+                    throw ['Não foi possível carregar o cliente.'];
+                }
+                const dados = await resposta.json();
+                const cliente = dados.entidade ?? dados.Entidade;
+                if (!cliente) {
+                    throw ['Cliente não encontrado.'];
+                }
+
+                detalheNome.textContent = cliente.nome ?? cliente.Nome ?? '';
+                detalheIdade.textContent = `${cliente.idade ?? cliente.Idade ?? '--'} anos`;
+                mensagemErro.classList.add('d-none');
+                cardDetalhes.style.display = 'block';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarCliente);
+    </script>
+}
