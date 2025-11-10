@@ -2,53 +2,80 @@
     ViewData["Title"] = "Clientes";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="mb-0">Clientes</h1>
-    <a class="btn btn-primary" href="/clientes/criar">Novo Cliente</a>
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">Gestão de clientes</h1>
+            <p class="text-muted mb-0">Gerencie alunos, personalize treinos e acompanhe a evolução de cada cadastro.</p>
+        </div>
+        <a class="btn btn-gradient" href="/clientes/criar"><i class="fa-solid fa-user-plus me-2"></i>Novo cliente</a>
+    </div>
+
+    <div class="table-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Lista de clientes</h5>
+            <button class="btn btn-outline-light btn-sm gradient-border" id="btnRecarregar">
+                <i class="fa-solid fa-rotate"></i>
+                Atualizar
+            </button>
+        </div>
+        <div id="erroCarregamento" class="alert alert-custom d-none" role="alert"></div>
+        <div class="table-responsive">
+            <table class="table align-middle text-white mb-0" id="tabelaClientes">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Idade</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-<div id="erroCarregamento" class="alert alert-danger d-none" role="alert"></div>
-<table class="table table-striped" id="tabelaClientes">
-    <thead class="thead-dark">
-        <tr>
-            <th>Nome</th>
-            <th>Idade</th>
-            <th class="text-right">Ações</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
 
 @section Scripts {
     <script>
         const tabelaClientes = document.querySelector('#tabelaClientes tbody');
         const erroCarregamento = document.querySelector('#erroCarregamento');
+        const btnRecarregar = document.querySelector('#btnRecarregar');
 
         function mostrarErro(mensagem) {
+            if (!mensagem) {
+                erroCarregamento.classList.add('d-none');
+                erroCarregamento.textContent = '';
+                return;
+            }
             erroCarregamento.textContent = mensagem;
             erroCarregamento.classList.remove('d-none');
-        }
-
-        function limparErro() {
-            erroCarregamento.classList.add('d-none');
-            erroCarregamento.textContent = '';
         }
 
         function criarLinha(cliente) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${cliente.nome ?? cliente.Nome}</td>
-                <td>${cliente.idade ?? cliente.Idade}</td>
-                <td class="text-right">
-                    <a class="btn btn-sm btn-secondary mr-2" href="/clientes/detalhes/${cliente.id ?? cliente.Id}">Detalhes</a>
-                    <a class="btn btn-sm btn-warning mr-2" href="/clientes/editar/${cliente.id ?? cliente.Id}">Editar</a>
-                    <a class="btn btn-sm btn-danger" href="/clientes/remover/${cliente.id ?? cliente.Id}">Remover</a>
+                <td class="fw-semibold">${cliente.nome ?? cliente.Nome}</td>
+                <td>${cliente.idade ?? cliente.Idade} anos</td>
+                <td class="text-end">
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-sm btn-outline-light gradient-border" href="/clientes/detalhes/${cliente.id ?? cliente.Id}">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                        <a class="btn btn-sm btn-gradient" href="/clientes/editar/${cliente.id ?? cliente.Id}">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+                        <a class="btn btn-sm btn-outline-light gradient-border" href="/clientes/remover/${cliente.id ?? cliente.Id}">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </div>
                 </td>`;
             return tr;
         }
 
         async function carregarClientes() {
-            limparErro();
-            tabelaClientes.innerHTML = '<tr><td colspan="3">Carregando...</td></tr>';
+            mostrarErro();
+            tabelaClientes.innerHTML = '<tr><td colspan="3" class="text-center py-4">Carregando clientes...</td></tr>';
             try {
                 const resposta = await fetch('/api/cliente/listarTodos');
                 if (!resposta.ok) {
@@ -58,18 +85,19 @@
                 const clientes = dados.listaEntidade ?? dados.ListaEntidade ?? [];
 
                 if (!Array.isArray(clientes) || clientes.length === 0) {
-                    tabelaClientes.innerHTML = '<tr><td colspan="3">Nenhum cliente cadastrado.</td></tr>';
+                    tabelaClientes.innerHTML = '<tr><td colspan="3" class="text-center py-4">Nenhum cliente cadastrado ainda.</td></tr>';
                     return;
                 }
 
                 tabelaClientes.innerHTML = '';
                 clientes.forEach(cliente => tabelaClientes.appendChild(criarLinha(cliente)));
             } catch (erro) {
-                tabelaClientes.innerHTML = '<tr><td colspan="3">Nenhum dado disponível.</td></tr>';
-                mostrarErro(erro.message);
+                tabelaClientes.innerHTML = '<tr><td colspan="3" class="text-center py-4">Nenhum dado disponível.</td></tr>';
+                mostrarErro(erro.message ?? 'Erro inesperado ao carregar os clientes.');
             }
         }
 
         document.addEventListener('DOMContentLoaded', carregarClientes);
+        btnRecarregar?.addEventListener('click', carregarClientes);
     </script>
 }

@@ -1,0 +1,16 @@
+@{
+    ViewData["Title"] = "Acesso negado";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="form-card text-center">
+                <i class="fa-solid fa-lock mb-3" style="font-size:3rem;color:#f7b733;"></i>
+                <h2 class="mb-3">Acesso negado</h2>
+                <p class="text-muted mb-4">Você não possui permissão para acessar esta funcionalidade. Entre com uma conta autorizada ou solicite acesso ao administrador.</p>
+                <a class="btn btn-gradient" href="@Url.Action("Login", "Account")">Ir para tela de login</a>
+            </div>
+        </div>
+    </div>
+</div>

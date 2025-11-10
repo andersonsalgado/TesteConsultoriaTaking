@@ -3,26 +3,40 @@
     var clienteId = ViewData["ClienteId"]?.ToString();
 }
 
-<h1>Remover Cliente</h1>
-<div id="mensagemErro" class="alert alert-danger d-none"></div>
-<div class="alert alert-warning">
-    Tem certeza de que deseja remover este cliente?
-</div>
-<div class="card" id="cardDetalhes" style="display:none;">
-    <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-2">Nome</dt>
-            <dd class="col-sm-10" id="detalheNome"></dd>
-
-            <dt class="col-sm-2">Idade</dt>
-            <dd class="col-sm-10" id="detalheIdade"></dd>
-        </dl>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div id="mensagemErro" class="alert alert-custom d-none"></div>
+            <div class="form-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h2 class="mb-1">Remover cliente</h2>
+                        <p class="text-muted mb-0">Essa ação excluirá o cadastro e histórico associado. Confirme antes de prosseguir.</p>
+                    </div>
+                    <span class="badge bg-dark">@clienteId</span>
+                </div>
+                <div class="alert alert-custom mb-4">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    Tem certeza de que deseja remover este cliente?
+                </div>
+                <dl class="row mb-4" id="cardDetalhes" style="display:none;">
+                    <dt class="col-sm-4 text-uppercase text-muted">Nome</dt>
+                    <dd class="col-sm-8 fw-semibold" id="detalheNome"></dd>
+                    <dt class="col-sm-4 text-uppercase text-muted">Idade</dt>
+                    <dd class="col-sm-8" id="detalheIdade"></dd>
+                </dl>
+                <form id="formRemover">
+                    <div class="d-grid gap-2 gap-md-3 d-md-flex justify-content-md-end">
+                        <a href="/clientes" class="btn btn-outline-light gradient-border">Cancelar</a>
+                        <button type="submit" class="btn btn-gradient">
+                            <i class="fa-solid fa-trash me-2"></i>Remover definitivamente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
-<form class="mt-3" id="formRemover">
-    <button type="submit" class="btn btn-danger">Remover</button>
-    <a href="/clientes" class="btn btn-secondary ml-2">Cancelar</a>
-</form>
 
 @section Scripts {
     <script>
@@ -53,9 +67,9 @@
                 }
 
                 detalheNome.textContent = cliente.nome ?? cliente.Nome ?? '';
-                detalheIdade.textContent = cliente.idade ?? cliente.Idade ?? '';
+                detalheIdade.textContent = `${cliente.idade ?? cliente.Idade ?? ''} anos`;
                 mensagemErro.classList.add('d-none');
-                cardDetalhes.style.display = 'block';
+                cardDetalhes.style.display = 'grid';
             } catch (erro) {
                 exibirErro(erro);
             }
@@ -64,7 +78,7 @@
         formRemover.addEventListener('submit', async (evento) => {
             evento.preventDefault();
             mensagemErro.classList.add('d-none');
-            mensagemErro.textContent = '';
+            mensagemErro.innerHTML = '';
             try {
                 const resposta = await fetch(`/api/cliente/remover/${clienteId}`, {
                     method: 'DELETE'
