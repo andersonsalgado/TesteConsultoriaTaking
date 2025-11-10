@@ -1,0 +1,73 @@
+@{
+    ViewData["Title"] = "Detalhes do Cliente";
+    var clienteId = ViewData["ClienteId"]?.ToString();
+}
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="text-center mb-4">
+                    <span class="badge badge-soft text-uppercase mb-2"><i class="bi bi-eye-fill me-2"></i>Detalhes</span>
+                    <h2 class="section-title mb-2">Ficha do cliente</h2>
+                    <p class="section-subtitle">Confira rapidamente as informações principais e acesse ações rápidas.</p>
+                </div>
+                <div class="gradient-card text-white">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div>
+                            <h4 id="clienteNome" class="fw-bold mb-1"></h4>
+                            <p class="mb-2" id="clienteIdade"></p>
+                        </div>
+                        <span class="badge bg-light text-dark px-3 py-2" id="clienteIdentificador"></span>
+                    </div>
+                    <p class="text-white-50 mb-4">Esses dados alimentam os planos personalizados e o histórico de treinos associados a este aluno.</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-outline-light" href="/clientes"><i class="bi bi-arrow-left me-2"></i>Voltar</a>
+                        <a class="btn btn-gradient" id="botaoEditar" href="#"><i class="bi bi-pencil-fill me-2"></i>Editar cliente</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        const clienteId = '@clienteId';
+        const clienteNome = document.querySelector('#clienteNome');
+        const clienteIdade = document.querySelector('#clienteIdade');
+        const clienteIdentificador = document.querySelector('#clienteIdentificador');
+        const botaoEditar = document.querySelector('#botaoEditar');
+
+        async function carregarCliente() {
+            try {
+                const resposta = await fetch(`/api/cliente/buscarcliente/${clienteId}`);
+                if (!resposta.ok) {
+                    throw new Error('Não foi possível carregar o cliente.');
+                }
+                const dados = await resposta.json();
+                const cliente = dados.entidade ?? dados.Entidade;
+                if (!cliente) {
+                    throw new Error('Cliente não encontrado.');
+                }
+
+                const nome = cliente.nome ?? cliente.Nome ?? '';
+                const idade = cliente.idade ?? cliente.Idade ?? 0;
+                const id = cliente.id ?? cliente.Id ?? clienteId;
+
+                clienteNome.textContent = nome;
+                clienteIdade.textContent = `${idade} anos de dedicação`; 
+                clienteIdentificador.textContent = id;
+                botaoEditar.href = `/clientes/editar/${id}`;
+            } catch (erro) {
+                clienteNome.textContent = 'Não foi possível carregar os dados';
+                clienteIdade.textContent = erro.message;
+                clienteIdentificador.textContent = 'Erro';
+                botaoEditar.classList.add('disabled');
+                botaoEditar.setAttribute('aria-disabled', 'true');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarCliente);
+    </script>
+}

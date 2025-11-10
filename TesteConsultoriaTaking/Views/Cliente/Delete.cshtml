@@ -1,0 +1,101 @@
+@{
+    ViewData["Title"] = "Remover Cliente";
+    var clienteId = ViewData["ClienteId"]?.ToString();
+}
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="text-center mb-4">
+                    <span class="badge badge-soft text-uppercase mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Atenção</span>
+                    <h2 class="section-title mb-2">Deseja realmente remover?</h2>
+                    <p class="section-subtitle">Essa ação não poderá ser desfeita e removerá os treinos associados a este cliente.</p>
+                </div>
+                <div class="form-surface">
+                    <div class="alert alert-warning" role="alert">
+                        <strong id="clienteNome">Carregando...</strong>
+                        <p class="mb-0" id="clienteResumo">Verificando informações do aluno.</p>
+                    </div>
+                    <div id="mensagemErro" class="alert alert-danger d-none"></div>
+                    <div class="d-flex flex-wrap gap-2 justify-content-between">
+                        <a href="/clientes" class="btn btn-outline-dark px-4"><i class="bi bi-arrow-left me-2"></i>Cancelar</a>
+                        <button id="btnRemover" class="btn btn-danger px-4"><i class="bi bi-trash-fill me-2"></i>Remover cliente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        const clienteId = '@clienteId';
+        const clienteNome = document.querySelector('#clienteNome');
+        const clienteResumo = document.querySelector('#clienteResumo');
+        const mensagemErro = document.querySelector('#mensagemErro');
+        const btnRemover = document.querySelector('#btnRemover');
+
+        function exibirErro(erros) {
+            if (!erros) {
+                mensagemErro.classList.add('d-none');
+                mensagemErro.textContent = '';
+                return;
+            }
+            const lista = Array.isArray(erros) ? erros : [erros];
+            mensagemErro.innerHTML = lista.map(e => `<div>${e}</div>`).join('');
+            mensagemErro.classList.remove('d-none');
+        }
+
+        async function carregarCliente() {
+            try {
+                const resposta = await fetch(`/api/cliente/buscarcliente/${clienteId}`);
+                if (!resposta.ok) {
+                    throw ['Não foi possível carregar o cliente.'];
+                }
+                const dados = await resposta.json();
+                const cliente = dados.entidade ?? dados.Entidade;
+                if (!cliente) {
+                    throw ['Cliente não encontrado.'];
+                }
+
+                const nome = cliente.nome ?? cliente.Nome ?? '';
+                const idade = cliente.idade ?? cliente.Idade ?? 0;
+
+                clienteNome.textContent = nome;
+                clienteResumo.textContent = `Idade: ${idade} anos`;
+            } catch (erro) {
+                exibirErro(erro);
+                clienteNome.textContent = 'Erro ao carregar dados';
+                clienteResumo.textContent = '';
+                btnRemover.classList.add('disabled');
+                btnRemover.setAttribute('aria-disabled', 'true');
+            }
+        }
+
+        btnRemover.addEventListener('click', async () => {
+            exibirErro();
+            btnRemover.disabled = true;
+            btnRemover.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Removendo...';
+            try {
+                const resposta = await fetch(`/api/cliente/remover/${clienteId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!resposta.ok) {
+                    const conteudo = await resposta.json().catch(() => null);
+                    const erros = conteudo?.listaErros ?? conteudo?.ListaErros ?? ['Não foi possível remover o cliente.'];
+                    throw erros;
+                }
+
+                window.location.href = '/clientes';
+            } catch (erro) {
+                exibirErro(erro);
+                btnRemover.disabled = false;
+                btnRemover.innerHTML = '<i class="bi bi-trash-fill me-2"></i>Remover cliente';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarCliente);
+    </script>
+}
