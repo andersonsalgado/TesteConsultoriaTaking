@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,17 +10,53 @@ using TesteConsultoriaTaking.Repository;
 
 namespace TesteConsultoriaTaking.Controllers
 {
-
+    [Authorize]
     [Route("api/[controller]")]
-    [ApiController]
     public class ClienteController : ControllerBaseEspec
     {
         private readonly ClienteRepository _clienteRepository;
 
         public ClienteController(ClienteRepository clienteRepository)
         {
-            
             _clienteRepository = clienteRepository;
+        }
+
+        [HttpGet("/clientes")]
+        public IActionResult IndexView()
+        {
+            ViewData["Title"] = "Funcionalidades - Clientes";
+            return View("Index");
+        }
+
+        [HttpGet("/clientes/criar")]
+        public IActionResult CreateView()
+        {
+            ViewData["Title"] = "Cadastrar cliente";
+            return View("Create");
+        }
+
+        [HttpGet("/clientes/editar/{id}")]
+        public IActionResult EditView([FromRoute] Guid id)
+        {
+            ViewData["ClienteId"] = id;
+            ViewData["Title"] = "Editar cliente";
+            return View("Edit");
+        }
+
+        [HttpGet("/clientes/detalhes/{id}")]
+        public IActionResult DetailsView([FromRoute] Guid id)
+        {
+            ViewData["ClienteId"] = id;
+            ViewData["Title"] = "Detalhes do cliente";
+            return View("Details");
+        }
+
+        [HttpGet("/clientes/remover/{id}")]
+        public IActionResult DeleteView([FromRoute] Guid id)
+        {
+            ViewData["ClienteId"] = id;
+            ViewData["Title"] = "Remover cliente";
+            return View("Delete");
         }
 
         [HttpGet]
@@ -28,7 +65,7 @@ namespace TesteConsultoriaTaking.Controllers
         {
             return new RetornoCliente()
             {
-                ListaEntidade = LimparLista<ClienteModel>( _clienteRepository.retornaListaCompleta()),
+                ListaEntidade = LimparLista<ClienteModel>(_clienteRepository.retornaListaCompleta()),
                 Sucesso = true
             };
         }
@@ -50,11 +87,12 @@ namespace TesteConsultoriaTaking.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var retorno = new RetornoCliente() {
+                var retorno = new RetornoCliente()
+                {
                     Sucesso = false,
                     ListaErros = RetornarEntradaComErro(ModelState)
                 };
-                
+
                 return StatusCode(StatusCodes.Status406NotAcceptable, retorno);
             }
 
@@ -73,15 +111,12 @@ namespace TesteConsultoriaTaking.Controllers
             };
 
             return StatusCode(StatusCodes.Status201Created, retornoCliente);
-
         }
-
 
         [HttpPut]
         [Route("atualizar/{id}")]
         public IActionResult Put(Guid id, [FromBody] EntradaCliente entradaCliente)
         {
-
             if (id != entradaCliente.Id)
             {
                 var retorno = new RetornoCliente()
@@ -121,7 +156,6 @@ namespace TesteConsultoriaTaking.Controllers
             return StatusCode(StatusCodes.Status202Accepted, retornoCliente);
         }
 
-        
         [HttpDelete]
         [Route("remover/{id}")]
         public IActionResult Delete(Guid id)
@@ -149,7 +183,7 @@ namespace TesteConsultoriaTaking.Controllers
                 Sucesso = true,
             };
 
-            return StatusCode(StatusCodes.Status202Accepted , retornoCliente);
+            return StatusCode(StatusCodes.Status202Accepted, retornoCliente);
         }
     }
 }

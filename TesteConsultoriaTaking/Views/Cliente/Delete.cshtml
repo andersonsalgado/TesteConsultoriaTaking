@@ -1,0 +1,101 @@
+@{
+    ViewData["Title"] = "Remover Cliente";
+    var clienteId = ViewData["ClienteId"]?.ToString();
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div id="mensagemErro" class="alert alert-custom d-none"></div>
+            <div class="form-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h2 class="mb-1">Remover cliente</h2>
+                        <p class="text-muted mb-0">Essa ação excluirá o cadastro e histórico associado. Confirme antes de prosseguir.</p>
+                    </div>
+                    <span class="badge bg-dark">@clienteId</span>
+                </div>
+                <div class="alert alert-custom mb-4">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    Tem certeza de que deseja remover este cliente?
+                </div>
+                <dl class="row mb-4" id="cardDetalhes" style="display:none;">
+                    <dt class="col-sm-4 text-uppercase text-muted">Nome</dt>
+                    <dd class="col-sm-8 fw-semibold" id="detalheNome"></dd>
+                    <dt class="col-sm-4 text-uppercase text-muted">Idade</dt>
+                    <dd class="col-sm-8" id="detalheIdade"></dd>
+                </dl>
+                <form id="formRemover">
+                    <div class="d-grid gap-2 gap-md-3 d-md-flex justify-content-md-end">
+                        <a href="/clientes" class="btn btn-outline-light gradient-border">Cancelar</a>
+                        <button type="submit" class="btn btn-gradient">
+                            <i class="fa-solid fa-trash me-2"></i>Remover definitivamente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const clienteId = '@clienteId';
+        const mensagemErro = document.querySelector('#mensagemErro');
+        const cardDetalhes = document.querySelector('#cardDetalhes');
+        const detalheNome = document.querySelector('#detalheNome');
+        const detalheIdade = document.querySelector('#detalheIdade');
+        const formRemover = document.querySelector('#formRemover');
+
+        function exibirErro(erros) {
+            const lista = Array.isArray(erros) ? erros : [erros];
+            mensagemErro.innerHTML = lista.map(e => `<div>${e}</div>`).join('');
+            mensagemErro.classList.remove('d-none');
+            cardDetalhes.style.display = 'none';
+        }
+
+        async function carregarCliente() {
+            try {
+                const resposta = await fetch(`/api/cliente/buscarcliente/${clienteId}`);
+                if (!resposta.ok) {
+                    throw ['Não foi possível carregar o cliente.'];
+                }
+                const dados = await resposta.json();
+                const cliente = dados.entidade ?? dados.Entidade;
+                if (!cliente) {
+                    throw ['Cliente não encontrado.'];
+                }
+
+                detalheNome.textContent = cliente.nome ?? cliente.Nome ?? '';
+                detalheIdade.textContent = `${cliente.idade ?? cliente.Idade ?? ''} anos`;
+                mensagemErro.classList.add('d-none');
+                cardDetalhes.style.display = 'grid';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        }
+
+        formRemover.addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+            mensagemErro.classList.add('d-none');
+            mensagemErro.innerHTML = '';
+            try {
+                const resposta = await fetch(`/api/cliente/remover/${clienteId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!resposta.ok) {
+                    const conteudo = await resposta.json().catch(() => null);
+                    const erros = conteudo?.listaErros ?? conteudo?.ListaErros ?? ['Não foi possível remover o cliente.'];
+                    throw erros;
+                }
+
+                window.location.href = '/clientes';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarCliente);
+    </script>
+}

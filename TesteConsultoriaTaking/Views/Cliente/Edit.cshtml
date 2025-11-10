@@ -1,0 +1,107 @@
+@{
+    ViewData["Title"] = "Editar Cliente";
+    var clienteId = ViewData["ClienteId"]?.ToString();
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="form-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h2 class="mb-1">Editar cadastro</h2>
+                        <p class="text-muted mb-0">Atualize as informações do aluno para manter os treinos sempre alinhados.</p>
+                    </div>
+                    <span class="badge bg-dark">@clienteId</span>
+                </div>
+                <form id="formEditar">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome completo</label>
+                        <input id="nome" name="nome" class="form-control" maxlength="180" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="idade" class="form-label">Idade</label>
+                        <input id="idade" name="idade" type="number" class="form-control" min="0" max="120" required />
+                    </div>
+                    <div id="mensagemErro" class="alert alert-custom d-none"></div>
+                    <div class="d-grid gap-2 gap-md-3 d-md-flex justify-content-md-end">
+                        <a href="/clientes" class="btn btn-outline-light gradient-border">Cancelar</a>
+                        <button type="submit" class="btn btn-gradient">Salvar alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const clienteId = '@clienteId';
+        const formEditar = document.querySelector('#formEditar');
+        const mensagemErro = document.querySelector('#mensagemErro');
+
+        function exibirErro(erros) {
+            if (!erros) {
+                mensagemErro.classList.add('d-none');
+                mensagemErro.innerHTML = '';
+                return;
+            }
+
+            const lista = Array.isArray(erros) ? erros : [erros];
+            mensagemErro.innerHTML = lista.map(e => `<div>${e}</div>`).join('');
+            mensagemErro.classList.remove('d-none');
+        }
+
+        async function carregarCliente() {
+            try {
+                const resposta = await fetch(`/api/cliente/buscarcliente/${clienteId}`);
+                if (!resposta.ok) {
+                    throw ['Não foi possível carregar o cliente.'];
+                }
+                const dados = await resposta.json();
+                const cliente = dados.entidade ?? dados.Entidade;
+                if (!cliente) {
+                    throw ['Cliente não encontrado.'];
+                }
+
+                formEditar.nome.value = cliente.nome ?? cliente.Nome ?? '';
+                formEditar.idade.value = cliente.idade ?? cliente.Idade ?? '';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        }
+
+        formEditar.addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+            exibirErro();
+
+            const payload = {
+                id: clienteId,
+                nome: formEditar.nome.value.trim(),
+                idade: Number.parseInt(formEditar.idade.value, 10)
+            };
+
+            try {
+                const resposta = await fetch(`/api/cliente/atualizar/${clienteId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!resposta.ok) {
+                    const conteudo = await resposta.json().catch(() => null);
+                    const erros = conteudo?.listaErros ?? conteudo?.ListaErros ?? ['Não foi possível atualizar o cliente.'];
+                    throw erros;
+                }
+
+                window.location.href = '/clientes';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarCliente);
+    </script>
+}
