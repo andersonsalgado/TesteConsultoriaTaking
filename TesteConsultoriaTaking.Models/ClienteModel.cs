@@ -15,10 +15,10 @@ namespace TesteConsultoriaTaking.Models
         public Guid Id { get; set; }
         
         [Required(ErrorMessage = "O campo 'Nome' é obrigatório")]
-        [Column(name: "nome",TypeName = "nvarchar(100)")]
+        [Column(name: "nome")]
         public string Nome { get; set; }
 
-        [Column(name: "idade", TypeName = "int")]
+        [Column(name: "idade")]
         public int Idade { get; set; }
 
         public ClienteModel(string nome, int idade)

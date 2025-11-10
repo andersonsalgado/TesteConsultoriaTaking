@@ -18,8 +18,41 @@ namespace TesteConsultoriaTaking.Controllers
 
         public ClienteController(ClienteRepository clienteRepository)
         {
-            
+
             _clienteRepository = clienteRepository;
+        }
+
+        [HttpGet("/clientes")]
+        public IActionResult IndexView()
+        {
+            return View("Index");
+        }
+
+        [HttpGet("/clientes/criar")]
+        public IActionResult CreateView()
+        {
+            return View("Create");
+        }
+
+        [HttpGet("/clientes/editar/{id}")]
+        public IActionResult EditView([FromRoute] Guid id)
+        {
+            ViewData["ClienteId"] = id;
+            return View("Edit");
+        }
+
+        [HttpGet("/clientes/detalhes/{id}")]
+        public IActionResult DetailsView([FromRoute] Guid id)
+        {
+            ViewData["ClienteId"] = id;
+            return View("Details");
+        }
+
+        [HttpGet("/clientes/remover/{id}")]
+        public IActionResult DeleteView([FromRoute] Guid id)
+        {
+            ViewData["ClienteId"] = id;
+            return View("Delete");
         }
 
         [HttpGet]

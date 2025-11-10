@@ -1,0 +1,95 @@
+@{
+    ViewData["Title"] = "Editar Cliente";
+    var clienteId = ViewData["ClienteId"]?.ToString();
+}
+
+<h1>Editar Cliente</h1>
+<div class="card">
+    <div class="card-body">
+        <form id="formEditar">
+            <div class="form-group">
+                <label for="nome">Nome</label>
+                <input id="nome" name="nome" class="form-control" maxlength="100" required />
+            </div>
+            <div class="form-group">
+                <label for="idade">Idade</label>
+                <input id="idade" name="idade" type="number" class="form-control" min="0" required />
+            </div>
+            <div id="mensagemErro" class="alert alert-danger d-none"></div>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a href="/clientes" class="btn btn-secondary ml-2">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const clienteId = '@clienteId';
+        const formEditar = document.querySelector('#formEditar');
+        const mensagemErro = document.querySelector('#mensagemErro');
+
+        function exibirErro(erros) {
+            if (!erros) {
+                mensagemErro.classList.add('d-none');
+                mensagemErro.textContent = '';
+                return;
+            }
+
+            const lista = Array.isArray(erros) ? erros : [erros];
+            mensagemErro.innerHTML = lista.map(e => `<div>${e}</div>`).join('');
+            mensagemErro.classList.remove('d-none');
+        }
+
+        async function carregarCliente() {
+            try {
+                const resposta = await fetch(`/api/cliente/buscarcliente/${clienteId}`);
+                if (!resposta.ok) {
+                    throw ['Não foi possível carregar o cliente.'];
+                }
+                const dados = await resposta.json();
+                const cliente = dados.entidade ?? dados.Entidade;
+                if (!cliente) {
+                    throw ['Cliente não encontrado.'];
+                }
+
+                formEditar.nome.value = cliente.nome ?? cliente.Nome ?? '';
+                formEditar.idade.value = cliente.idade ?? cliente.Idade ?? '';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        }
+
+        formEditar.addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+            exibirErro();
+
+            const payload = {
+                id: clienteId,
+                nome: formEditar.nome.value.trim(),
+                idade: Number.parseInt(formEditar.idade.value, 10)
+            };
+
+            try {
+                const resposta = await fetch(`/api/cliente/atualizar/${clienteId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!resposta.ok) {
+                    const conteudo = await resposta.json().catch(() => null);
+                    const erros = conteudo?.listaErros ?? conteudo?.ListaErros ?? ['Não foi possível atualizar o cliente.'];
+                    throw erros;
+                }
+
+                window.location.href = '/clientes';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarCliente);
+    </script>
+}

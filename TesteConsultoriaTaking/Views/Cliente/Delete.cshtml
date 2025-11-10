@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Remover Cliente";
+    var clienteId = ViewData["ClienteId"]?.ToString();
+}
+
+<h1>Remover Cliente</h1>
+<div id="mensagemErro" class="alert alert-danger d-none"></div>
+<div class="alert alert-warning">
+    Tem certeza de que deseja remover este cliente?
+</div>
+<div class="card" id="cardDetalhes" style="display:none;">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-2">Nome</dt>
+            <dd class="col-sm-10" id="detalheNome"></dd>
+
+            <dt class="col-sm-2">Idade</dt>
+            <dd class="col-sm-10" id="detalheIdade"></dd>
+        </dl>
+    </div>
+</div>
+<form class="mt-3" id="formRemover">
+    <button type="submit" class="btn btn-danger">Remover</button>
+    <a href="/clientes" class="btn btn-secondary ml-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    <script>
+        const clienteId = '@clienteId';
+        const mensagemErro = document.querySelector('#mensagemErro');
+        const cardDetalhes = document.querySelector('#cardDetalhes');
+        const detalheNome = document.querySelector('#detalheNome');
+        const detalheIdade = document.querySelector('#detalheIdade');
+        const formRemover = document.querySelector('#formRemover');
+
+        function exibirErro(erros) {
+            const lista = Array.isArray(erros) ? erros : [erros];
+            mensagemErro.innerHTML = lista.map(e => `<div>${e}</div>`).join('');
+            mensagemErro.classList.remove('d-none');
+            cardDetalhes.style.display = 'none';
+        }
+
+        async function carregarCliente() {
+            try {
+                const resposta = await fetch(`/api/cliente/buscarcliente/${clienteId}`);
+                if (!resposta.ok) {
+                    throw ['Não foi possível carregar o cliente.'];
+                }
+                const dados = await resposta.json();
+                const cliente = dados.entidade ?? dados.Entidade;
+                if (!cliente) {
+                    throw ['Cliente não encontrado.'];
+                }
+
+                detalheNome.textContent = cliente.nome ?? cliente.Nome ?? '';
+                detalheIdade.textContent = cliente.idade ?? cliente.Idade ?? '';
+                mensagemErro.classList.add('d-none');
+                cardDetalhes.style.display = 'block';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        }
+
+        formRemover.addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+            mensagemErro.classList.add('d-none');
+            mensagemErro.textContent = '';
+            try {
+                const resposta = await fetch(`/api/cliente/remover/${clienteId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!resposta.ok) {
+                    const conteudo = await resposta.json().catch(() => null);
+                    const erros = conteudo?.listaErros ?? conteudo?.ListaErros ?? ['Não foi possível remover o cliente.'];
+                    throw erros;
+                }
+
+                window.location.href = '/clientes';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarCliente);
+    </script>
+}

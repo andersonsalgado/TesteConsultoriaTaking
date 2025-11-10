@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TesteConsultoriaTaking.Migrations;
@@ -17,25 +16,20 @@ namespace TesteConsultoriaTaking.Migrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.10")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "3.1.10");
 
             modelBuilder.Entity("TesteConsultoriaTaking.Models.ClienteModel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("id")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnName("id");
 
                     b.Property<int>("Idade")
-                        .HasColumnName("idade")
-                        .HasColumnType("int");
+                        .HasColumnName("idade");
 
                     b.Property<string>("Nome")
                         .IsRequired()
-                        .HasColumnName("nome")
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnName("nome");
 
                     b.HasKey("Id");
 

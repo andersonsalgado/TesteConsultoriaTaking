@@ -31,7 +31,7 @@ namespace TesteConsultoriaTaking
             //services.AddDbContext<DatabaseContext>(options => 
             //    options.UseSqlServer(Configuration.GetConnectionString("TesteConsultoriaTaking")));
 
-            services.AddControllers().AddJsonOptions(jsonOptions => {
+            services.AddControllersWithViews().AddJsonOptions(jsonOptions => {
                 jsonOptions.JsonSerializerOptions.IgnoreNullValues = true;
             });
 

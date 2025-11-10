@@ -1,0 +1,75 @@
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Clientes</h1>
+    <a class="btn btn-primary" href="/clientes/criar">Novo Cliente</a>
+</div>
+<div id="erroCarregamento" class="alert alert-danger d-none" role="alert"></div>
+<table class="table table-striped" id="tabelaClientes">
+    <thead class="thead-dark">
+        <tr>
+            <th>Nome</th>
+            <th>Idade</th>
+            <th class="text-right">Ações</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@section Scripts {
+    <script>
+        const tabelaClientes = document.querySelector('#tabelaClientes tbody');
+        const erroCarregamento = document.querySelector('#erroCarregamento');
+
+        function mostrarErro(mensagem) {
+            erroCarregamento.textContent = mensagem;
+            erroCarregamento.classList.remove('d-none');
+        }
+
+        function limparErro() {
+            erroCarregamento.classList.add('d-none');
+            erroCarregamento.textContent = '';
+        }
+
+        function criarLinha(cliente) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${cliente.nome ?? cliente.Nome}</td>
+                <td>${cliente.idade ?? cliente.Idade}</td>
+                <td class="text-right">
+                    <a class="btn btn-sm btn-secondary mr-2" href="/clientes/detalhes/${cliente.id ?? cliente.Id}">Detalhes</a>
+                    <a class="btn btn-sm btn-warning mr-2" href="/clientes/editar/${cliente.id ?? cliente.Id}">Editar</a>
+                    <a class="btn btn-sm btn-danger" href="/clientes/remover/${cliente.id ?? cliente.Id}">Remover</a>
+                </td>`;
+            return tr;
+        }
+
+        async function carregarClientes() {
+            limparErro();
+            tabelaClientes.innerHTML = '<tr><td colspan="3">Carregando...</td></tr>';
+            try {
+                const resposta = await fetch('/api/cliente/listarTodos');
+                if (!resposta.ok) {
+                    throw new Error('Não foi possível carregar os clientes.');
+                }
+                const dados = await resposta.json();
+                const clientes = dados.listaEntidade ?? dados.ListaEntidade ?? [];
+
+                if (!Array.isArray(clientes) || clientes.length === 0) {
+                    tabelaClientes.innerHTML = '<tr><td colspan="3">Nenhum cliente cadastrado.</td></tr>';
+                    return;
+                }
+
+                tabelaClientes.innerHTML = '';
+                clientes.forEach(cliente => tabelaClientes.appendChild(criarLinha(cliente)));
+            } catch (erro) {
+                tabelaClientes.innerHTML = '<tr><td colspan="3">Nenhum dado disponível.</td></tr>';
+                mostrarErro(erro.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarClientes);
+    </script>
+}

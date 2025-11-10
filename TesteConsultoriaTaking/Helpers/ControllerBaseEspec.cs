@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TesteConsultoriaTaking.Helpers
 {
-    public class ControllerBaseEspec : ControllerBase
+    public class ControllerBaseEspec : Controller
     {
         public List<T> LimparLista<T>(object objetoEntrada)
         {
