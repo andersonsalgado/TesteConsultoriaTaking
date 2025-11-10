@@ -12,8 +12,8 @@ namespace TesteConsultoriaTaking.Migrations.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(nullable: false),
-                    nome = table.Column<string>(type: "nvarchar(100)", nullable: false),
-                    idade = table.Column<int>(type: "int", nullable: false)
+                    nome = table.Column<string>(nullable: false),
+                    idade = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

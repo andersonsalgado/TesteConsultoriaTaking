@@ -1,0 +1,97 @@
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<section class="section-padding clients-wrapper">
+    <div class="container">
+        <div class="row align-items-center mb-4">
+            <div class="col-lg-8">
+                <h2 class="section-title mb-2">Clientes da sua academia</h2>
+                <p class="section-subtitle mb-0">Gerencie fichas de treino e mantenha tudo organizado em um painel moderno e responsivo.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <a class="btn btn-gradient" href="/clientes/criar"><i class="bi bi-person-plus-fill me-2"></i>Novo Cliente</a>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-lg">
+            <div class="card-body p-4">
+                <div id="erroCarregamento" class="alert alert-danger d-none" role="alert"></div>
+                <div class="table-responsive">
+                    <table class="table align-middle" id="tabelaClientes">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Idade</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        const tabelaClientes = document.querySelector('#tabelaClientes tbody');
+        const erroCarregamento = document.querySelector('#erroCarregamento');
+
+        function mostrarErro(mensagem) {
+            erroCarregamento.textContent = mensagem;
+            erroCarregamento.classList.remove('d-none');
+        }
+
+        function limparErro() {
+            erroCarregamento.classList.add('d-none');
+            erroCarregamento.textContent = '';
+        }
+
+        function criarLinha(cliente) {
+            const tr = document.createElement('tr');
+            const id = cliente.id ?? cliente.Id;
+            const nome = cliente.nome ?? cliente.Nome;
+            const idade = cliente.idade ?? cliente.Idade;
+
+            tr.innerHTML = `
+                <td class="fw-semibold">${nome}</td>
+                <td><span class="badge bg-dark text-warning px-3 py-2">${idade} anos</span></td>
+                <td class="text-end">
+                    <div class="d-flex flex-wrap gap-2 justify-content-end">
+                        <a class="btn btn-sm btn-outline-dark action-btn" href="/clientes/detalhes/${id}"><i class="bi bi-eye-fill me-1"></i>Detalhes</a>
+                        <a class="btn btn-sm btn-warning text-dark action-btn" href="/clientes/editar/${id}"><i class="bi bi-pencil-fill me-1"></i>Editar</a>
+                        <a class="btn btn-sm btn-danger action-btn" href="/clientes/remover/${id}"><i class="bi bi-trash-fill me-1"></i>Remover</a>
+                    </div>
+                </td>`;
+            return tr;
+        }
+
+        async function carregarClientes() {
+            limparErro();
+            tabelaClientes.innerHTML = '<tr><td colspan="3" class="text-center py-4"><div class="spinner-border text-warning" role="status"><span class="visually-hidden">Carregando...</span></div></td></tr>';
+            try {
+                const resposta = await fetch('/api/cliente/listarTodos');
+                if (!resposta.ok) {
+                    throw new Error('Não foi possível carregar os clientes.');
+                }
+                const dados = await resposta.json();
+                const clientes = dados.listaEntidade ?? dados.ListaEntidade ?? [];
+
+                if (!Array.isArray(clientes) || clientes.length === 0) {
+                    tabelaClientes.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted">Nenhum cliente cadastrado ainda. Clique em "Novo Cliente" para começar.</td></tr>';
+                    return;
+                }
+
+                tabelaClientes.innerHTML = '';
+                clientes.forEach(cliente => tabelaClientes.appendChild(criarLinha(cliente)));
+            } catch (erro) {
+                tabelaClientes.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-muted">Nenhum dado disponível.</td></tr>';
+                mostrarErro(erro.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarClientes);
+    </script>
+}
