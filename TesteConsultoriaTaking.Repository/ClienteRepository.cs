@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
+using System;
 using TesteConsultoriaTaking.Migrations;
 using TesteConsultoriaTaking.Models;
 using TesteConsultoriaTaking.Shared;
@@ -18,7 +19,7 @@ namespace TesteConsultoriaTaking.Repository
         {
             try
             {
-                contexto.Add<ClienteModel>(clienteModel);
+                contexto.Set<ClienteModel>().Add(clienteModel);
                 var save = contexto.SaveChanges();
 
                 if (save > 0)

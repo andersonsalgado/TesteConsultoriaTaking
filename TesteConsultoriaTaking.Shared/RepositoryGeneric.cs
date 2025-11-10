@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,14 @@ namespace TesteConsultoriaTaking.Shared
     public abstract class RepositoryGeneric<TEntity> : IAplicacaoInterface<TEntity> where TEntity : class
     {
 
-        private DbContext _context;
+        private DatabaseContext _context;
 
         public RepositoryGeneric(DatabaseContext _context)
         {
             this._context = _context;
         }
 
-        public DbContext getContext()
+        public DatabaseContext getContext()
         {
             return _context;
         }
@@ -59,7 +60,7 @@ namespace TesteConsultoriaTaking.Shared
                 if (entidade != null)
                 {
                     _context.Set<TEntity>().Attach(entidade);
-                    _context.Entry(entidade).State = EntityState.Modified;
+                    _context.Entry(entidade).State = System.Data.Entity.EntityState.Modified;
                     int retornoSave = _context.SaveChanges();
                     if (retornoSave >= 0)
                     {
@@ -128,7 +129,7 @@ namespace TesteConsultoriaTaking.Shared
             try
             {
                 _context.Set<TEntity>().Remove(entidade);
-                _context.Entry(entidade).State = EntityState.Deleted;
+                _context.Entry(entidade).State = System.Data.Entity.EntityState.Deleted;
 
                 int retornoSave = _context.SaveChanges();
                 if (retornoSave >= 0)

@@ -39,6 +39,7 @@ namespace TesteConsultoriaTaking
                     options.Password.RequiredLength = 6;
                 })
                 .AddEntityFrameworkStores<DatabaseContext>();
+                //.AddEntityFrameworkStores<DatabaseContext>();
 
             services.AddControllersWithViews().AddJsonOptions(jsonOptions =>
             {

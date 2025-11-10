@@ -6,6 +6,7 @@ using TesteConsultoriaTaking.Repository;
 using TesteConsultoriaTaking.Shared;
 using TesteConsultoriaTaking.Models;
 using System;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace TesteConsultoriaTaking.Helpers
 {
