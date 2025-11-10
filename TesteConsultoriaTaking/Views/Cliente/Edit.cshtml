@@ -1,0 +1,114 @@
+@{
+    ViewData["Title"] = "Editar Cliente";
+    var clienteId = ViewData["ClienteId"]?.ToString();
+}
+
+<section class="py-5">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="form-elevated">
+                    <div class="d-flex align-items-center mb-4">
+                        <span class="gradient-icon me-3"><i class="bi bi-pencil-square"></i></span>
+                        <div>
+                            <h2 class="fw-bold mb-0">Editar cliente</h2>
+                            <p class="text-muted mb-0">Atualize dados importantes para manter o acompanhamento assertivo.</p>
+                        </div>
+                    </div>
+                    <form id="formEditar" novalidate>
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome completo</label>
+                            <input id="nome" name="nome" class="form-control" maxlength="100" required />
+                        </div>
+                        <div class="mb-4">
+                            <label for="idade" class="form-label">Idade</label>
+                            <input id="idade" name="idade" type="number" class="form-control" min="0" required />
+                        </div>
+                        <div id="mensagemErro" class="alert alert-danger d-none"></div>
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-gradient flex-grow-1">Salvar alterações</button>
+                            <a href="/clientes" class="btn btn-outline-dark">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        const clienteId = '@clienteId';
+        const formEditar = document.querySelector('#formEditar');
+        const mensagemErro = document.querySelector('#mensagemErro');
+
+        function exibirErro(erros) {
+            if (!erros) {
+                mensagemErro.classList.add('d-none');
+                mensagemErro.textContent = '';
+                return;
+            }
+
+            const lista = Array.isArray(erros) ? erros : [erros];
+            mensagemErro.innerHTML = lista.map(e => `<div>${e}</div>`).join('');
+            mensagemErro.classList.remove('d-none');
+        }
+
+        async function carregarCliente() {
+            try {
+                const resposta = await fetch(`/api/cliente/buscarcliente/${clienteId}`);
+                if (!resposta.ok) {
+                    throw ['Não foi possível carregar o cliente.'];
+                }
+                const dados = await resposta.json();
+                const cliente = dados.entidade ?? dados.Entidade;
+                if (!cliente) {
+                    throw ['Cliente não encontrado.'];
+                }
+
+                formEditar.nome.value = cliente.nome ?? cliente.Nome ?? '';
+                formEditar.idade.value = cliente.idade ?? cliente.Idade ?? '';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        }
+
+        formEditar.addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+            exibirErro();
+
+            const payload = {
+                id: clienteId,
+                nome: formEditar.nome.value.trim(),
+                idade: Number.parseInt(formEditar.idade.value, 10)
+            };
+
+            if (!payload.nome || Number.isNaN(payload.idade)) {
+                exibirErro('Preencha todas as informações do cliente.');
+                return;
+            }
+
+            try {
+                const resposta = await fetch(`/api/cliente/atualizar/${clienteId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!resposta.ok) {
+                    const conteudo = await resposta.json().catch(() => null);
+                    const erros = conteudo?.listaErros ?? conteudo?.ListaErros ?? ['Não foi possível atualizar o cliente.'];
+                    throw erros;
+                }
+
+                window.location.href = '/clientes';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarCliente);
+    </script>
+}

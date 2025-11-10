@@ -1,0 +1,114 @@
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<section class="py-5">
+    <div class="container py-4">
+        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
+            <div>
+                <span class="badge-pill-custom mb-2">Cadastre, acompanhe, inspire</span>
+                <h1 class="fw-bold mb-0">Clientes</h1>
+                <p class="text-muted mb-0">Mantenha os perfis sempre atualizados e entregue treinos personalizados com poucos cliques.</p>
+            </div>
+            <a class="btn btn-gradient btn-lg" href="/clientes/criar"><i class="bi bi-person-plus-fill me-2"></i>Novo Cliente</a>
+        </div>
+        <div id="erroCarregamento" class="alert alert-danger d-none" role="alert"></div>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
+                    <div class="input-group flex-grow-1 flex-md-grow-0" style="max-width: 360px;">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="filtroNome" placeholder="Filtrar por nome" />
+                    </div>
+                    <div class="text-muted small">Total: <span id="contadorClientes">0</span> clientes</div>
+                </div>
+                <div class="table-responsive table-zen">
+                    <table class="table align-middle mb-0" id="tabelaClientes">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th class="text-center">Idade</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        const tabelaClientes = document.querySelector('#tabelaClientes tbody');
+        const erroCarregamento = document.querySelector('#erroCarregamento');
+        const filtroNome = document.querySelector('#filtroNome');
+        const contadorClientes = document.querySelector('#contadorClientes');
+        let clientesCache = [];
+
+        function mostrarErro(mensagem) {
+            erroCarregamento.textContent = mensagem;
+            erroCarregamento.classList.remove('d-none');
+        }
+
+        function limparErro() {
+            erroCarregamento.classList.add('d-none');
+            erroCarregamento.textContent = '';
+        }
+
+        function criarLinha(cliente) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="fw-semibold">${cliente.nome ?? cliente.Nome}</td>
+                <td class="text-center"><span class="badge bg-dark text-warning px-3 py-2 rounded-pill">${cliente.idade ?? cliente.Idade}</span></td>
+                <td class="text-end">
+                    <div class="btn-group">
+                        <a class="btn btn-sm btn-outline-dark" href="/clientes/detalhes/${cliente.id ?? cliente.Id}"><i class="bi bi-eye-fill me-1"></i>Detalhes</a>
+                        <a class="btn btn-sm btn-outline-warning" href="/clientes/editar/${cliente.id ?? cliente.Id}"><i class="bi bi-pencil-fill me-1"></i>Editar</a>
+                        <a class="btn btn-sm btn-outline-danger" href="/clientes/remover/${cliente.id ?? cliente.Id}"><i class="bi bi-trash-fill me-1"></i>Remover</a>
+                    </div>
+                </td>`;
+            return tr;
+        }
+
+        function preencherTabela(lista) {
+            if (!Array.isArray(lista) || lista.length === 0) {
+                tabelaClientes.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4">Nenhum cliente cadastrado ainda.</td></tr>';
+                contadorClientes.textContent = '0';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            lista.forEach(cliente => fragment.appendChild(criarLinha(cliente)));
+            tabelaClientes.innerHTML = '';
+            tabelaClientes.appendChild(fragment);
+            contadorClientes.textContent = lista.length;
+        }
+
+        async function carregarClientes() {
+            limparErro();
+            tabelaClientes.innerHTML = '<tr><td colspan="3" class="text-center py-4"><div class="spinner-border text-warning" role="status"><span class="visually-hidden">Carregando...</span></div></td></tr>';
+            try {
+                const resposta = await fetch('/api/cliente/listarTodos');
+                if (!resposta.ok) {
+                    throw new Error('Não foi possível carregar os clientes.');
+                }
+                const dados = await resposta.json();
+                clientesCache = dados.listaEntidade ?? dados.ListaEntidade ?? [];
+                preencherTabela(clientesCache);
+            } catch (erro) {
+                tabelaClientes.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4">Nenhum dado disponível.</td></tr>';
+                mostrarErro(erro.message ?? 'Erro inesperado ao carregar os clientes.');
+            }
+        }
+
+        filtroNome.addEventListener('input', () => {
+            const termo = filtroNome.value.toLowerCase();
+            const filtrados = clientesCache.filter(cliente => (cliente.nome ?? cliente.Nome ?? '').toLowerCase().includes(termo));
+            preencherTabela(filtrados);
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarClientes);
+    </script>
+}

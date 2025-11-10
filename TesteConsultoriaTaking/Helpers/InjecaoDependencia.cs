@@ -14,7 +14,7 @@ namespace TesteConsultoriaTaking.Helpers
         public static void AdicionarContexto(IServiceCollection services, IConfiguration Configuration)
         {
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("TesteConsultoriaTaking")));
+                options.UseSqlite(Configuration.GetConnectionString("TesteConsultoriaTaking")));
         }
 
         public static void InjetarRepositorios(IServiceCollection services)

@@ -24,7 +24,7 @@ namespace TesteConsultoriaTaking.Dto.Cliente
 
         public ClienteModel ToModel(Guid id)
         {
-            var model = new ClienteModel(this.Id, this.Nome, this.Idade);
+            var model = new ClienteModel(id, this.Nome, this.Idade);
             return model;
         }
     }

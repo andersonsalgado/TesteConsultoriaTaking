@@ -1,15 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using TesteConsultoriaTaking.Models;
 
 namespace TesteConsultoriaTaking.Migrations
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : IdentityDbContext<ApplicationUser>
     {
-
         public DbSet<ClienteModel> ClienteModel { get; set; }
 
         public DatabaseContext([NotNullAttribute] DbContextOptions options) : base(options)
@@ -19,6 +16,5 @@ namespace TesteConsultoriaTaking.Migrations
         protected DatabaseContext()
         {
         }
-
     }
 }
