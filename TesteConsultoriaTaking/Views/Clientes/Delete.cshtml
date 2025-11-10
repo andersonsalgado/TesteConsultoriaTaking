@@ -1,0 +1,114 @@
+@{
+    ViewData["Title"] = "Remover Cliente";
+    var clienteId = ViewData["ClienteId"]?.ToString();
+}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8">
+                <div class="card-blur p-4">
+                    <span class="badge badge-custom text-uppercase mb-2">Confirmação</span>
+                    <h2 class="section-title fs-2 mb-0">Remover aluno da base</h2>
+                    <p class="text-secondary mb-0">Essa ação é irreversível. O cliente será excluído e não aparecerá mais nos relatórios da plataforma.</p>
+                </div>
+            </div>
+        </div>
+        <div id="mensagemErro" class="alert alert-warning d-none"></div>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="feature-card mb-3" id="cardDetalhes" style="display:none;">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="feature-icon"><i class="bi bi-exclamation-octagon-fill"></i></div>
+                        <div>
+                            <h3 class="mb-0" id="detalheNome"></h3>
+                            <span class="text-secondary" id="detalheIdade"></span>
+                        </div>
+                    </div>
+                    <p class="text-secondary mb-0">Confirme se deseja realmente remover este registro. Você poderá cadastrar o aluno novamente no futuro.</p>
+                </div>
+                <form class="d-flex gap-3" id="formRemover">
+                    <button type="submit" class="btn btn-outline-danger btn-icon flex-grow-1">
+                        <i class="bi bi-trash-fill"></i>
+                        Remover definitivamente
+                    </button>
+                    <a href="/clientes" class="btn btn-outline-light btn-icon">
+                        <i class="bi bi-arrow-left"></i>
+                        Cancelar
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <script>
+        const clienteId = '@clienteId';
+        const mensagemErro = document.querySelector('#mensagemErro');
+        const cardDetalhes = document.querySelector('#cardDetalhes');
+        const detalheNome = document.querySelector('#detalheNome');
+        const detalheIdade = document.querySelector('#detalheIdade');
+        const formRemover = document.querySelector('#formRemover');
+
+        function exibirErro(erros) {
+            const lista = Array.isArray(erros) ? erros : [erros];
+            mensagemErro.innerHTML = lista.map(e => `<div>${e}</div>`).join('');
+            mensagemErro.classList.remove('d-none');
+            cardDetalhes.style.display = 'none';
+        }
+
+        async function carregarCliente() {
+            try {
+                const resposta = await fetch(`/api/cliente/buscarcliente/${clienteId}`);
+                if (resposta.status === 401) {
+                    const retorno = encodeURIComponent(window.location.pathname + window.location.search);
+                    window.location.href = `/Account/Login?returnUrl=${retorno}`;
+                    return;
+                }
+                if (!resposta.ok) {
+                    throw ['Não foi possível carregar o cliente.'];
+                }
+                const dados = await resposta.json();
+                const cliente = dados.entidade ?? dados.Entidade;
+                if (!cliente) {
+                    throw ['Cliente não encontrado.'];
+                }
+
+                detalheNome.textContent = cliente.nome ?? cliente.Nome ?? '';
+                detalheIdade.textContent = `${cliente.idade ?? cliente.Idade ?? '--'} anos`;
+                mensagemErro.classList.add('d-none');
+                cardDetalhes.style.display = 'block';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        }
+
+        formRemover.addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+            mensagemErro.classList.add('d-none');
+            mensagemErro.innerHTML = '';
+            try {
+                const resposta = await fetch(`/api/cliente/remover/${clienteId}`, {
+                    method: 'DELETE'
+                });
+
+                if (resposta.status === 401) {
+                    const retorno = encodeURIComponent(window.location.pathname + window.location.search);
+                    window.location.href = `/Account/Login?returnUrl=${retorno}`;
+                    return;
+                }
+
+                if (!resposta.ok) {
+                    const conteudo = await resposta.json().catch(() => null);
+                    const erros = conteudo?.listaErros ?? conteudo?.ListaErros ?? ['Não foi possível remover o cliente.'];
+                    throw erros;
+                }
+
+                window.location.href = '/clientes';
+            } catch (erro) {
+                exibirErro(erro);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarCliente);
+    </script>
+}

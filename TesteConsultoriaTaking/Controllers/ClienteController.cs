@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using TesteConsultoriaTaking.Repository;
 
 namespace TesteConsultoriaTaking.Controllers
 {
-
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ClienteController : ControllerBaseEspec
@@ -18,7 +19,6 @@ namespace TesteConsultoriaTaking.Controllers
 
         public ClienteController(ClienteRepository clienteRepository)
         {
-            
             _clienteRepository = clienteRepository;
         }
 
@@ -28,7 +28,7 @@ namespace TesteConsultoriaTaking.Controllers
         {
             return new RetornoCliente()
             {
-                ListaEntidade = LimparLista<ClienteModel>( _clienteRepository.retornaListaCompleta()),
+                ListaEntidade = LimparLista<ClienteModel>(_clienteRepository.retornaListaCompleta()),
                 Sucesso = true
             };
         }
@@ -54,7 +54,7 @@ namespace TesteConsultoriaTaking.Controllers
                     Sucesso = false,
                     ListaErros = RetornarEntradaComErro(ModelState)
                 };
-                
+
                 return StatusCode(StatusCodes.Status406NotAcceptable, retorno);
             }
 
@@ -121,7 +121,7 @@ namespace TesteConsultoriaTaking.Controllers
             return StatusCode(StatusCodes.Status202Accepted, retornoCliente);
         }
 
-        
+
         [HttpDelete]
         [Route("remover/{id}")]
         public IActionResult Delete(Guid id)
